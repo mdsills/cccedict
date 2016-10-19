@@ -25,7 +25,7 @@ class Parser
     }
 
     /**
-     * reads lines from the file, and removes comments
+     * Reads lines from the file, separates any meta-data, and parses the file
      *
      * @return array
      */
