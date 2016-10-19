@@ -25,52 +25,36 @@ class Parser
     }
 
     /**
-     * Parses the data
+     * Reads lines from the file, separates any meta-data, and parses the file
      *
      * @return array
      */
     public function parse()
     {
-        $skippedLines = [];
         $parsedLines = [];
+        $skippedLines = [];
 
-        $lines = $this->readLines();
-
-        foreach ($lines as $line) {
-            $parsedLine = $this->parseLine($line);
-
-            if ($parsedLine) {
-                $parsedLines[] = $parsedLine;
-            } else {
-                $skippedLines[] = $line;
+        $fp = fopen($this->filePath, "r") or die("Error opening file.");
+        if ($fp) {
+            while (!feof($fp)) {
+                $line = fgets($fp, 4096);
+                if ($line !== '' || strpos($line, '#') !== 0) {
+                    $parsedLine = $this->parseLine($line);
+                    if ($parsedLine) {
+                        $parsedLines[] = $parsedLine;
+                    } else {
+                        $skippedLines[] = $line;
+                    }
+                }
             }
+            return [
+                'numSkipped' => count($skippedLines),
+                'numParsed' => count($parsedLines),
+                'parsedLines' => $parsedLines,
+                'skippedLines' => $skippedLines,
+            ];
         }
-
-        return [
-            'numSkipped' => count($skippedLines),
-            'numParsed' => count($parsedLines),
-            'parsedLines' => $parsedLines,
-            'skippedLines' => $skippedLines,
-        ];
-    }
-
-    /**
-     * reads lines from the file, and removes comments
-     *
-     * @return array
-     */
-    private function readLines()
-    {
-        $outputLines = [];
-        $lines = file($this->filePath);
-
-        foreach ($lines as $line) {
-            if (strpos($line, '#') !== 0) {
-                $outputLines[] = $line;
-            }
-        }
-
-        return $outputLines;
+        return false;
     }
 
     /**
