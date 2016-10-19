@@ -3,6 +3,7 @@
 require('config.php');
 require('autoload.php');
 
+use CcCedict\Entry;
 use CcCedict\Parser;
 use CcCedict\Unpacker;
 
@@ -23,6 +24,12 @@ $filePath = $unpacker->unpack();
 // PARSING
 // now we can parse it
 $parser = new Parser();
+
+// optionally, set options
+$parser->setOptions([
+    Entry::F_ORIGINAL,
+    Entry::F_PINYIN_DIACRITIC,
+]);
 
 // tell the parser where the uncompressed data is
 $parser->setFilePath($filePath);

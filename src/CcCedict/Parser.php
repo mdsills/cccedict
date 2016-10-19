@@ -15,6 +15,13 @@ class Parser
     private $filePath;
 
     /**
+     * options for Entry report
+     *
+     * @var array
+     */
+    private $options = [];
+
+    /**
      * Sets the path/filename containing the raw uncompressed CC-CEDICT data
      *
      * @param string $filePath
@@ -22,6 +29,16 @@ class Parser
     public function setFilePath($filePath)
     {
         $this->filePath = $filePath;
+    }
+
+    /**
+     * set options with which to configure the report from the Entry object
+     *
+     * @param array $options
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
     }
 
     /**
@@ -38,7 +55,7 @@ class Parser
 
         if ($fp) {
             while (!feof($fp)) {
-                $line = fgets($fp);
+                $line = trim(fgets($fp));
                 if ($line !== '' || strpos($line, '#') !== 0) {
                     $parsedLine = $this->parseLine($line);
                     if ($parsedLine) {
@@ -76,7 +93,11 @@ class Parser
             $entry = new Entry();
             $entry->setData($match);
 
-            return $entry->getBasic();
+            if (count($this->options)) {
+                return $entry->getOptional($this->options);
+            } else {
+                return $entry->getBasic();
+            }
         } else {
             return false;
         }

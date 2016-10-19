@@ -3,6 +3,16 @@ namespace CcCedict;
 
 class Entry
 {
+    const F_ORIGINAL = 'original';
+    const F_TRADITIONAL = 'traditional';
+    const F_SIMPLIFIED = 'simplified';
+    const F_PINYIN = 'pinyin';
+    const F_PINYIN_NUMERIC = 'pinyinNumeric';
+    const F_PINYIN_DIACRITIC = 'pinyinDiacritic';
+    const F_ENGLISH = 'english';
+    const F_TRADITIONAL_CHARS = 'traditionalChars';
+    const F_SIMPLIFIED_CHARS = 'simplifiedChars';
+
     /**
      * holds the data about one entry
      *
@@ -17,13 +27,11 @@ class Entry
      */
     public function setData($match)
     {
-        $this->data['original'] = $match[0];
-        $this->data['traditional'] = $match[1];
-        $this->data['simplified'] = $match[2];
-        $this->data['pinyin'] = $match[3];
-        $this->data['pinyinNumeric'] = $this->convertToPinyinNumeric($match[3]);
-        $this->data['pinyinDiacritic'] = $this->convertToPinyinDiacritic($match[3]);
-        $this->data['english'] = $match[4];
+        $this->data[self::F_ORIGINAL] = $match[0];
+        $this->data[self::F_TRADITIONAL] = $match[1];
+        $this->data[self::F_SIMPLIFIED] = $match[2];
+        $this->data[self::F_PINYIN] = $match[3];
+        $this->data[self::F_ENGLISH] = $match[4];
     }
 
     /**
@@ -33,11 +41,94 @@ class Entry
      */
     public function getBasic()
     {
-        $this->data['english'] = explode('/', $this->data['english']);
-        $this->data['traditionalChars'] = $this->extractChineseChars($this->data['traditional']);
-        $this->data['simplifiedChars'] = $this->extractChineseChars($this->data['simplified']);
+        $this->data[self::F_ENGLISH] = explode('/', $this->data[self::F_ENGLISH]);
+        $this->data[self::F_TRADITIONAL_CHARS] = $this->resolveOption(self::F_TRADITIONAL_CHARS);
+        $this->data[self::F_SIMPLIFIED_CHARS] = $this->resolveOption(self::F_SIMPLIFIED_CHARS);
 
         return $this->data;
+    }
+
+    /**
+     * gets a report of the entry content, featuring specified fields
+     *
+     * @param  array $options Fields we want to see in the report, referenced by
+     *                        class constants, e.g. Entry::F_ORIGINAL
+     *
+     * @return array
+     */
+    public function getOptional(array $options)
+    {
+        foreach ($options as $option) {
+            $this->data[$option] = $this->resolveOption($option);
+        }
+
+        return $this->data;
+    }
+
+    /**
+     * gets a full report of the entry content
+     *
+     * @return array
+     */
+    public function getFull()
+    {
+        $this->getBasic();
+
+        $this->data[self::F_PINYIN_NUMERIC] = $this->resolveOption(self::F_PINYIN_NUMERIC);
+        $this->data[self::F_PINYIN_DIACRITIC] = $this->resolveOption(self::F_PINYIN_DIACRITIC);
+
+        return $this->data;
+    }
+
+    /**
+     * gets data for given option
+     *
+     * @param  string $option The option we want
+     *
+     * @return mixed The data for the named option
+     */
+    private function resolveOption($option)
+    {
+        switch ($option) {
+            case self::F_ORIGINAL:
+                return $this->data[self::F_ORIGINAL];
+                break;
+
+            case self::F_TRADITIONAL:
+                return $this->data[self::F_TRADITIONAL];
+                break;
+
+            case self::F_SIMPLIFIED:
+                return $this->data[self::F_SIMPLIFIED];
+                break;
+
+            case self::F_PINYIN:
+                return $this->data[self::F_PINYIN];
+                break;
+
+            case self::F_ENGLISH:
+                return $this->data[self::F_ENGLISH];
+                break;
+
+            case self::F_TRADITIONAL_CHARS:
+                return $this->extractChineseChars($this->resolveOption(self::F_TRADITIONAL));
+                break;
+
+            case self::F_SIMPLIFIED_CHARS:
+                return $this->extractChineseChars($this->resolveOption(self::F_SIMPLIFIED));
+                break;
+
+            case self::F_PINYIN_NUMERIC:
+                return $this->convertToPinyinNumeric($this->resolveOption(self::F_PINYIN));
+                break;
+
+            case self::F_PINYIN_DIACRITIC:
+                return $this->convertToPinyinDiacritic($this->resolveOption(self::F_PINYIN));
+                break;
+
+            default:
+                throw new \Exception('Unknown option: ' . $option);
+        }
     }
 
     /**
@@ -60,6 +151,11 @@ class Entry
      * unimplemented
      * definitely worth reading https://cc-cedict.org/wiki/format:syntax before
      * getting into this
+     *
+     * there are some idiocyncracies in CC-CEDICT pinyin
+     * e.g. these might be alternatives
+     * lu:4 => lü4
+     * xia4 r5 => xiàr
      *
      * @todo
      * @param  string $pinyin
@@ -184,7 +280,7 @@ class Entry
                         $returnPinyins[] = $pinyin;
                     }
                 } else {
-                    // u:=>ü conversion still required for neutral tones and anything
+                    // u: => ü conversion still required for neutral tones and anything
                     // anything that was not a pinyin (like a middot or a single char)
                     $returnPinyins[] = str_replace(['u:', 'U:'], ['ü', 'Ü'], $pinyin);
                 }
