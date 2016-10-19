@@ -34,10 +34,11 @@ class Parser
         $parsedLines = [];
         $skippedLines = [];
 
-        $fp = fopen($this->filePath, "r") or die("Error opening file.");
+        $fp = fopen($this->filePath, 'r');
+
         if ($fp) {
             while (!feof($fp)) {
-                $line = fgets($fp, 4096);
+                $line = fgets($fp);
                 if ($line !== '' || strpos($line, '#') !== 0) {
                     $parsedLine = $this->parseLine($line);
                     if ($parsedLine) {
@@ -53,14 +54,16 @@ class Parser
                 'parsedLines' => $parsedLines,
                 'skippedLines' => $skippedLines,
             ];
+        } else {
+            throw new \Exception('Could not open file for parsing: ' . $this->filePath);
         }
-        return false;
     }
 
     /**
      * parses a single line from the file, checking to see it meets basic dictionary spec
      *
      * @param  string $line A line from the CC-CEDICT file
+     *
      * @return false|array
      */
     private function parseLine($line)

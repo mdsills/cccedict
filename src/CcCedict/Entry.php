@@ -44,6 +44,7 @@ class Entry
      * extracts the Chinese characters
      *
      * @param  string $chinese String with Chinese characters in it
+     *
      * @return array
      */
     private function extractChineseChars($chinese)
@@ -62,6 +63,7 @@ class Entry
      *
      * @todo
      * @param  string $pinyin
+     *
      * @return string
      */
     private function convertToPinyinNumeric($pinyin)
@@ -75,19 +77,19 @@ class Entry
      * CC-CEDICT pinyin formatting info: https://cc-cedict.org/wiki/format:syntax
      *
      * @param  string $pinyin
+     *
      * @return string
      */
     private function convertToPinyinDiacritic($pinyin) {
-        // $pinyin = "lu:5 er4 bing1 liao3 zhuang2"; // for testing purposes
+        // $pinyin = "lu:5 er4 bing1 liao3 zhuang2";
 
         // allowed vowels in pinyin. Put the u: and U: before the u and U to avoid any greed
-        $vowels = array('u:','a','e','i','o','u','U:','A','E','I','O','U');
+        $vowels = array('u:', 'a', 'e', 'i', 'o', 'u', 'U:', 'A', 'E', 'I', 'O', 'U');
 
         // explode pinyin string into elements, including pinyins and any punctuation marks
-        $pinyins = explode(" ",$pinyin);
+        $pinyins = explode(' ', $pinyin);
 
-        // messy conversion array per tone, I know of no computationally efficient way
-        // to achieve this. Number of vowels is limited anyway, this way is easiest.
+        // map tone-vowel to diacritic'd-vowel
         $conversion = array(
             1 => array(
                 'a' => 'ā',
@@ -102,7 +104,7 @@ class Entry
                 'O' => 'Ō',
                 'U' => 'Ū',
                 'U:' => 'Ǖ',
-                ),
+            ),
             2 => array(
                 'a' => 'á',
                 'e' => 'é',
@@ -116,7 +118,7 @@ class Entry
                 'O' => 'Ó',
                 'U' => 'Ú',
                 'U:' => 'Ǘ',
-                ),
+            ),
             3 => array(
                 'a' => 'ǎ',
                 'e' => 'ě',
@@ -130,7 +132,7 @@ class Entry
                 'O' => 'Ǒ',
                 'U' => 'Ǔ',
                 'U:' => 'Ǚ',
-                ),
+            ),
             4 => array(
                 'a' => 'à',
                 'e' => 'è',
@@ -144,75 +146,60 @@ class Entry
                 'O' => 'Ò',
                 'U' => 'Ù',
                 'U:' => 'Ǜ',
-                ),
-            );
+            ),
+        );
 
-        // prepare array for pinyins to be returned
-        $returnpinyins = [];
+        $returnPinyins = [];
 
-        // let's iterate through each pinyin
         foreach ($pinyins as $pinyin) {
 
             // get tone number from end of pinyin, cast it to integer
             // so that any non-numeric values will become 0
-            $tone = (int)substr($pinyin,-1,1);
+            $tone = (int)substr($pinyin, -1, 1);
 
             // if there was a valid tone marker (1-5), strip the marker from the pinyin
             if ($tone > 0 && $tone < 6) {
-                $pinyin = substr($pinyin,0,-1);
-            
+                $pinyin = substr($pinyin, 0, -1);
+
                 // no full conversion needed for pinyin with neutral tone (5)
                 if ($tone < 5) {
-
                     // a, e or the o in ou always get the marker
-                    $to_convert_pos = stripos($pinyin,'a') ?: stripos($pinyin,'e') ?: stripos($pinyin,'ou');
-                    
+                    $toConvertPosition = stripos($pinyin, 'a') ? : stripos($pinyin, 'e') ? : stripos($pinyin, 'ou');
+
                     // if no a, e, or ou found, the tone mark goes on the last vowel
-                    if ($to_convert_pos === false) {
-                        for ($i=strlen($pinyin);$i>=0;$i--) {
-                            if (in_array(substr($pinyin,$i,1),$vowels)) {
-                                $to_convert_pos = $i;
+                    if ($toConvertPosition === false) {
+                        for ($i = strlen($pinyin); $i >= 0; $i--) {
+                            if (in_array(substr($pinyin, $i, 1), $vowels)) {
+                                $toConvertPosition = $i;
                                 break;
                             }
                         }
                     }
 
                     // if the vowel position is set
-                    if ($to_convert_pos!==false) { 
-                        $to_convert = substr($pinyin,$to_convert_pos,1);
-                        $returnpinyins[] = str_replace($to_convert,$conversion[$tone][$to_convert],$pinyin);
+                    if ($toConvertPosition !== false) {
+                        $toConvert = substr($pinyin, $toConvertPosition, 1);
+                        $returnPinyins[] = str_replace($toConvert, $conversion[$tone][$toConvert], $pinyin);
                     } else {
-                        $returnpinyins[] = $pinyin;
+                        $returnPinyins[] = $pinyin;
                     }
                 } else {
-
                     // u:=>ü conversion still required for neutral tones and anything
                     // anything that was not a pinyin (like a middot or a single char)
-                    $returnpinyins[] = str_replace(['u:','U:'],['ü','Ü'],$pinyin);
+                    $returnPinyins[] = str_replace(['u:', 'U:'], ['ü', 'Ü'], $pinyin);
                 }
             } else {
-
                 // simply add items that were not pinyins but rather punctiation marks
                 // or single char without a tone
-                $returnpinyins[] = $pinyin;
+                $returnPinyins[] = $pinyin;
             }
         }
 
-        // pour array elements into one long string
-        if (isset($returnpinyins)) {
-            $returnstring = "";
-            foreach ($returnpinyins as $pinyin) {
-
-                // add a space between each element
-                $returnstring .= $pinyin." ";
-            }
-
-            // trim off the superfluous space after the last element
-            return rtrim($returnstring);
+        if (isset($returnPinyins)) {
+            return implode(' ', $returnPinyins);
         }
 
         // if somehow nothing was set during the above, return error message
         return 'No valid elements';
     }
-
 }
