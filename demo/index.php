@@ -31,7 +31,7 @@ $parser->setFilePath($filePath);
 $output = $parser->parse();
 
 // print the output
-print_r($output);
+// print_r($output);
 
 // remove the temporary file
 $unpacker->removeOutputFile();

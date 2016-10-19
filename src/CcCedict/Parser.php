@@ -33,26 +33,44 @@ class Parser
     {
         $parsedLines = [];
         $skippedLines = [];
+        $count = 0;
 
+        // below function imitates a print_r() output of all the lines, except that
+        // it does not tab properly. It is also ugly, but faster and less RAM-hungry
+        // than buffering the entire dictionary into an array before output.
+        // better tabbing can be achieved by adding \t markers and iterating on each 
+        // array within the array.
         $fp = fopen($this->filePath, "r") or die("Error opening file.");
         if ($fp) {
+            echo "Array\n(\n[parsedLines] => Array\n(\n";
             while (!feof($fp)) {
                 $line = fgets($fp, 4096);
                 if ($line !== '' || strpos($line, '#') !== 0) {
                     $parsedLine = $this->parseLine($line);
                     if ($parsedLine) {
-                        $parsedLines[] = $parsedLine;
+                        echo "[".$count."] => Array\n(\n";
+                        foreach ($parsedLine as $key=>$value) {
+                            echo "[".$key."] => ".print_r($value,true)."\n";
+                        }
+                        echo "\n)\n";
+                        $count++;
                     } else {
                         $skippedLines[] = $line;
                     }
                 }
             }
-            return [
-                'numSkipped' => count($skippedLines),
-                'numParsed' => count($parsedLines),
-                'parsedLines' => $parsedLines,
-                'skippedLines' => $skippedLines,
-            ];
+            echo "\n)\n[numParsed] => ".$count;
+            echo "\n[skippedLines] => ".print_r($skippedLines, true);
+            echo "\n[numSkipped] => ".count($skippedLines);
+            echo "\n)";
+
+            return true;
+            // return [
+            //     'numSkipped' => count($skippedLines),
+            //     'numParsed' => count($parsedLines),
+            //     'parsedLines' => $parsedLines,
+            //     'skippedLines' => $skippedLines,
+            // ];
         }
         return false;
     }
