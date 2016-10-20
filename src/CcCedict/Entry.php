@@ -14,11 +14,18 @@ class Entry
     const F_SIMPLIFIED_CHARS = 'simplifiedChars';
 
     /**
-     * holds the data about one entry
+     * the original data about one entry
      *
      * @var array
      */
-    private $data;
+    private $dataOriginal;
+
+    /**
+     * the data prepared for out about one entry
+     *
+     * @var array
+     */
+    private $dataOutput;
 
     /**
      * sets the data values from the parser's match data
@@ -27,11 +34,7 @@ class Entry
      */
     public function setData($match)
     {
-        $this->data[self::F_ORIGINAL] = $match[0];
-        $this->data[self::F_TRADITIONAL] = $match[1];
-        $this->data[self::F_SIMPLIFIED] = $match[2];
-        $this->data[self::F_PINYIN] = $match[3];
-        $this->data[self::F_ENGLISH] = $match[4];
+        $this->dataOriginal = $match;
     }
 
     /**
@@ -41,11 +44,11 @@ class Entry
      */
     public function getBasic()
     {
-        $this->data[self::F_ENGLISH] = explode('/', $this->data[self::F_ENGLISH]);
-        $this->data[self::F_TRADITIONAL_CHARS] = $this->resolveOption(self::F_TRADITIONAL_CHARS);
-        $this->data[self::F_SIMPLIFIED_CHARS] = $this->resolveOption(self::F_SIMPLIFIED_CHARS);
+        $this->dataOutput[self::F_ENGLISH] = explode('/', $this->resolveOption(self::F_ENGLISH));
+        $this->dataOutput[self::F_TRADITIONAL_CHARS] = $this->resolveOption(self::F_TRADITIONAL_CHARS);
+        $this->dataOutput[self::F_SIMPLIFIED_CHARS] = $this->resolveOption(self::F_SIMPLIFIED_CHARS);
 
-        return $this->data;
+        return $this->dataOutput;
     }
 
     /**
@@ -59,10 +62,10 @@ class Entry
     public function getOptional(array $options)
     {
         foreach ($options as $option) {
-            $this->data[$option] = $this->resolveOption($option);
+            $this->dataOutput[$option] = $this->resolveOption($option);
         }
 
-        return $this->data;
+        return $this->dataOutput;
     }
 
     /**
@@ -74,10 +77,10 @@ class Entry
     {
         $this->getBasic();
 
-        $this->data[self::F_PINYIN_NUMERIC] = $this->resolveOption(self::F_PINYIN_NUMERIC);
-        $this->data[self::F_PINYIN_DIACRITIC] = $this->resolveOption(self::F_PINYIN_DIACRITIC);
+        $this->dataOutput[self::F_PINYIN_NUMERIC] = $this->resolveOption(self::F_PINYIN_NUMERIC);
+        $this->dataOutput[self::F_PINYIN_DIACRITIC] = $this->resolveOption(self::F_PINYIN_DIACRITIC);
 
-        return $this->data;
+        return $this->dataOutput;
     }
 
     /**
@@ -91,23 +94,23 @@ class Entry
     {
         switch ($option) {
             case self::F_ORIGINAL:
-                return $this->data[self::F_ORIGINAL];
+                return $this->dataOriginal[0];
                 break;
 
             case self::F_TRADITIONAL:
-                return $this->data[self::F_TRADITIONAL];
+                return $this->dataOriginal[1];
                 break;
 
             case self::F_SIMPLIFIED:
-                return $this->data[self::F_SIMPLIFIED];
+                return $this->dataOriginal[2];
                 break;
 
             case self::F_PINYIN:
-                return $this->data[self::F_PINYIN];
+                return $this->dataOriginal[3];
                 break;
 
             case self::F_ENGLISH:
-                return $this->data[self::F_ENGLISH];
+                return $this->dataOriginal[4];
                 break;
 
             case self::F_TRADITIONAL_CHARS:
