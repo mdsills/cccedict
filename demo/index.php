@@ -35,9 +35,10 @@ $parser->setOptions([
 // tell the parser where the uncompressed data is
 $parser->setFilePath($filePath);
 
-// do the parse
-foreach ($parser->parse() as $output) {
-	// print the output
+// do the parse, first parameter is number of lines to parse; second is where to start
+// both parameters are optional; defaults are INF (infinity) resp. 0.
+// since the parse() function yields values as they come, you need a while/foreach loop
+foreach ($parser->parse(500,29) as $output) {
 	print_r($output);
 }
 

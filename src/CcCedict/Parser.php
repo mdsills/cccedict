@@ -45,11 +45,16 @@ class Parser
     }
 
     /**
-     * Reads lines from the file, separates any meta-data, and parses the file
+     * Reads lines from the file, separates any meta-data,
+     * Parses each line and yields line-per-line as an Entry object
+     * Finally also yields skipped lines, and number of parsed and skipped lines
      *
-     * @return array
+     * @param double $numberOfLines Number of lines to read from $startLine, default = INF
+     * @param double $startLine First line to read (0-based), default = 0
+     *
+     * @return none (yields arrays)
      */
-    public function parse($startLine=0,$numberOfLines=INF)
+    public function parse($numberOfLines=INF, $startLine=0)
     {
         $parsedLines = [];
         $skippedLines = [];
