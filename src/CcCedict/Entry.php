@@ -162,13 +162,13 @@ class Entry
         // $pinyin = 'xian4 r5 lu:3 lu:3 r5'; // for testing purposes
         // I'm not sure how these option thingies work so I'm not going to introduce
         // a set of new ones to define the numeric style, but you may call them below.
-        $relevant_option_name = true;
+        $relevantOptionName = true;
 
-        if ($relevant_option_name) {
+        if ($relevantOptionName) {
             $pinyin = str_replace(['u:','U:'], ['ü','Ü'], $pinyin);
         }
 
-        if ($relevant_option_name) {
+        if ($relevantOptionName) {
             $pinyin = preg_replace('/(\d) r5/', 'r$1', $pinyin);
         }
 
