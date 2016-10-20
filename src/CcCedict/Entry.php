@@ -155,15 +155,27 @@ class Entry
      * there are some idiocyncracies in CC-CEDICT pinyin
      * e.g. these might be alternatives
      * lu:4 => lü4
-     * xia4 r5 => xiàr
+     * xian4 r5 => xiànr
      *
-     * @todo
      * @param  string $pinyin
      *
      * @return string
      */
-    private function convertToPinyinNumeric($pinyin)
-    {
+    private function convertToPinyinNumeric($pinyin) {
+        // $pinyin = 'xian4 r5 lu:3 lu:3 r5'; // for testing purposes
+        // I'm not sure how these option thingies work so I'm not going to introduce
+        // a set of new ones to define the numeric style, but you may call them below.
+        $relevant_option_name = true;
+
+        if ($relevant_option_name) {
+            $pinyin = str_replace(['u:','U:'], ['ü','Ü'], $pinyin);
+        }
+
+        if ($relevant_option_name) {
+            $pinyin = preg_replace('/(\d) r5/', 'r$1', $pinyin);
+        }
+
+        return $pinyin;
     }
 
     /**
@@ -177,10 +189,10 @@ class Entry
      * @return string
      */
     private function convertToPinyinDiacritic($pinyin) {
-        // $pinyin = "lu:5 er4 bing1 liao3 zhuang2";
+        // $pinyin = "nu:3 er2 lu:5 er4 bing1 liao3 zhuang2 V gou3"; // for testing purposes only
 
-        // allowed vowels in pinyin. Put the u: and U: before the u and U to avoid any greed
-        $vowels = array('u:', 'a', 'e', 'i', 'o', 'u', 'U:', 'A', 'E', 'I', 'O', 'U');
+        // allowed vowels in pinyin.
+        $vowels = array('a', 'e', 'i', 'o', 'u', 'u:', 'A', 'E', 'I', 'O', 'U', 'U:');
 
         // explode pinyin string into elements, including pinyins and any punctuation marks
         $pinyins = explode(' ', $pinyin);
@@ -274,7 +286,12 @@ class Entry
 
                     // if the vowel position is set
                     if ($toConvertPosition !== false) {
-                        $toConvert = substr($pinyin, $toConvertPosition, 1);
+                        // if the vowel is followed by a :, we need to consider two characters
+                        if (substr($pinyin, $toConvertPosition+1, 1) == ":") {
+                            $toConvert = substr($pinyin, $toConvertPosition, 2);
+                        } else {
+                            $toConvert = substr($pinyin, $toConvertPosition, 1);
+                        }
                         $returnPinyins[] = str_replace($toConvert, $conversion[$tone][$toConvert], $pinyin);
                     } else {
                         $returnPinyins[] = $pinyin;

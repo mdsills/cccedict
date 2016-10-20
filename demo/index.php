@@ -29,6 +29,7 @@ $parser = new Parser();
 $parser->setOptions([
     Entry::F_ORIGINAL,
     Entry::F_PINYIN_DIACRITIC,
+    Entry::F_PINYIN_NUMERIC,
 ]);
 
 // tell the parser where the uncompressed data is
