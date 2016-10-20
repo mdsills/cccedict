@@ -2,6 +2,9 @@
 
 namespace CcCedict;
 
+use \SplFileObject;
+use \LimitIterator;
+
 /**
  * Class for parsing the CC-CEDICT dictionary
  */
@@ -42,34 +45,46 @@ class Parser
     }
 
     /**
-     * Reads lines from the file, separates any meta-data, and parses the file
+     * Reads lines from the file, separates any meta-data,
+     * Parses each line and yields line-per-line as an Entry object
+     * Finally also yields skipped lines, and number of parsed and skipped lines
      *
-     * @return array
+     * @param double $numberOfLines Number of lines to read from $startLine, default = INF
+     * @param double $startLine First line to read (0-based), default = 0
+     *
+     * @return none (yields arrays)
      */
-    public function parse()
+    public function parse($numberOfLines=INF, $startLine=0)
     {
         $parsedLines = [];
         $skippedLines = [];
 
-        $fp = fopen($this->filePath, 'r');
+        $file = new SplFileObject($this->filePath);
+        $file->seek($startLine);
 
-        if ($fp) {
-            while (!feof($fp)) {
-                $line = trim(fgets($fp));
+        if ($file) {
+            $count = 0;
+
+            for ($i=0;!$file->eof() && $i<$numberOfLines;$i++) {
+                $line = trim($file->current());
+
                 if ($line !== '' || strpos($line, '#') !== 0) {
                     $parsedLine = $this->parseLine($line);
+
                     if ($parsedLine) {
-                        $parsedLines[] = $parsedLine;
+                        $count++;
+                        yield $parsedLine;
                     } else {
                         $skippedLines[] = $line;
                     }
                 }
+
+                $file->next();
             }
-            return [
-                'numSkipped' => count($skippedLines),
-                'numParsed' => count($parsedLines),
-                'parsedLines' => $parsedLines,
+            yield [
                 'skippedLines' => $skippedLines,
+                'numSkipped' => count($skippedLines),
+                'numParsed' => $count,
             ];
         } else {
             throw new \Exception('Could not open file for parsing: ' . $this->filePath);
