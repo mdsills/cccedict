@@ -3,7 +3,6 @@
 namespace CcCedict;
 
 use \SplFileObject;
-use \LimitIterator;
 
 /**
  * Class for parsing the CC-CEDICT dictionary
@@ -49,12 +48,12 @@ class Parser
      * Parses each line and yields line-per-line as an Entry object
      * Finally also yields skipped lines, and number of parsed and skipped lines
      *
-     * @param double $numberOfLines Number of lines to read from $startLine, default = INF
-     * @param double $startLine First line to read (0-based), default = 0
+     * @param int $startLine First line to read (0-based), default = 0
+     * @param int $numberOfLines Number of lines to read from $startLine, default = 50
      *
      * @return none (yields arrays)
      */
-    public function parse($numberOfLines=INF, $startLine=0)
+    public function parse($startLine = 0, $numberOfLines = 50)
     {
         $parsedLines = [];
         $skippedLines = [];
@@ -63,17 +62,16 @@ class Parser
         $file->seek($startLine);
 
         if ($file) {
-            $count = 0;
+            $numParsed = 0;
 
-            for ($i=0;!$file->eof() && $i<$numberOfLines;$i++) {
+            for ($i = 0; !$file->eof() && $i < $numberOfLines; $i++) {
                 $line = trim($file->current());
 
                 if ($line !== '' || strpos($line, '#') !== 0) {
                     $parsedLine = $this->parseLine($line);
 
                     if ($parsedLine) {
-                        $count++;
-                        yield $parsedLine;
+                        $parsedLines[] = $parsedLine;
                     } else {
                         $skippedLines[] = $line;
                     }
@@ -81,10 +79,12 @@ class Parser
 
                 $file->next();
             }
+
             yield [
+                'parsedLines' => $parsedLines,
                 'skippedLines' => $skippedLines,
                 'numSkipped' => count($skippedLines),
-                'numParsed' => $count,
+                'numParsed' => count($parsedLines),
             ];
         } else {
             throw new \Exception('Could not open file for parsing: ' . $this->filePath);
