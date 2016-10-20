@@ -148,14 +148,11 @@ class Entry
     /**
      * Converts the CC-CEDICT pinyin to more familar numeric pinyin
      *
-     * unimplemented
-     * definitely worth reading https://cc-cedict.org/wiki/format:syntax before
-     * getting into this
+     * CC-CEDICT Pinyin formatting info: https://cc-cedict.org/wiki/format:syntax
      *
-     * there are some idiocyncracies in CC-CEDICT pinyin
-     * e.g. these might be alternatives
+     * This deals with idiocyncracies in CC-CEDICT pinyin where:
      * lu:4 => lü4
-     * xian4 r5 => xiànr
+     * xian4 r5 => xianr4
      *
      * @param  string $pinyin
      *
