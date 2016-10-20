@@ -2,6 +2,9 @@
 
 namespace CcCedict;
 
+use \SplFileObject;
+use \LimitIterator;
+
 /**
  * Class for parsing the CC-CEDICT dictionary
  */
@@ -46,30 +49,37 @@ class Parser
      *
      * @return array
      */
-    public function parse()
+    public function parse($startLine=0,$numberOfLines=INF)
     {
         $parsedLines = [];
         $skippedLines = [];
 
-        $fp = fopen($this->filePath, 'r');
+        $file = new SplFileObject($this->filePath);
+        $file->seek($startLine);
 
-        if ($fp) {
-            while (!feof($fp)) {
-                $line = trim(fgets($fp));
+        if ($file) {
+            $count = 0;
+
+            for ($i=0;!$file->eof() && $i<$numberOfLines;$i++) {
+                $line = trim($file->current());
+
                 if ($line !== '' || strpos($line, '#') !== 0) {
                     $parsedLine = $this->parseLine($line);
+
                     if ($parsedLine) {
-                        $parsedLines[] = $parsedLine;
+                        $count++;
+                        yield $parsedLine;
                     } else {
                         $skippedLines[] = $line;
                     }
                 }
+
+                $file->next();
             }
-            return [
-                'numSkipped' => count($skippedLines),
-                'numParsed' => count($parsedLines),
-                'parsedLines' => $parsedLines,
+            yield [
                 'skippedLines' => $skippedLines,
+                'numSkipped' => count($skippedLines),
+                'numParsed' => $count,
             ];
         } else {
             throw new \Exception('Could not open file for parsing: ' . $this->filePath);

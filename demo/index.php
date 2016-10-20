@@ -36,10 +36,10 @@ $parser->setOptions([
 $parser->setFilePath($filePath);
 
 // do the parse
-$output = $parser->parse();
-
-// print the output
-print_r($output);
+foreach ($parser->parse() as $output) {
+	// print the output
+	print_r($output);
+}
 
 // remove the temporary file
 $unpacker->removeOutputFile();
