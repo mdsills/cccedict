@@ -54,9 +54,6 @@ With setOptions(array) (see above), you can change the data included in the Entr
 ### Limitations
 - 2Unlimited!
 
-### Known bugs and issues
-- Not all characters are currently extracted properly, see [Issue #6: certain characters won't return any data](https://github.com/mdsills/cccedict/issues/6 "Issue #6: certain characters won't return any data")
-
 ### Opportunities for improvement
 - Well perhaps it could output various formats (e.g. JSON) instead of simply arrays?
 - Any further Chinese in the English translation (references, alternative spellings, or full forms of abbreviations) could be structured and nested
