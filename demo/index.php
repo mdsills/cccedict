@@ -29,6 +29,9 @@ $parser = new Parser();
 $parser->setOptions([
     Entry::F_ORIGINAL,
     Entry::F_TRADITIONAL,
+    Entry::F_TRADITIONAL_CHARS,
+    Entry::F_SIMPLIFIED_CHARS,
+    Entry::F_ENGLISH,
     Entry::F_PINYIN_DIACRITIC,
     Entry::F_PINYIN_NUMERIC,
 ]);

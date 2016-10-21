@@ -143,7 +143,10 @@ class Entry
      */
     private function extractChineseChars($chinese)
     {
-        preg_match_all('#\p{Lo}#u', $chinese, $matches);
+        // below regex catches all Chinese characters, also those that are outside
+        // the everyday spectrum (such as Suzhou numerals or rare variants)
+        // this makes sense for the dictionary
+        preg_match_all('#[\p{Nl}\p{So}\p{Lm}\p{Lo}]#u', $chinese, $matches);
 
         return $matches[0];
     }
