@@ -35,10 +35,19 @@ $parser->setOptions([
 // tell the parser where the uncompressed data is
 $parser->setFilePath($filePath);
 
+// tell the parser how much data it should read at a time
+$parser->setBlockSize(50);
+
+// tell the parser where to begin
+$parser->setStartLine(0);
+
+// tell the parser how many blocks to get
+// this is really optional because you could achieve
+// the same with a combination of setBlockSize() and setStartLine())
+$parser->setNumberOfBlocks(INF);
+
 // do the parse
-// first parameter is which line to start
-// second parameter is number of lines to parse
-foreach ($parser->parse(50, 100) as $output) {
+foreach ($parser->parse() as $output) {
 	print_r($output);
 }
 

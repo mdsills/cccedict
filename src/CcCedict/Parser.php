@@ -24,6 +24,27 @@ class Parser
     private $options = [];
 
     /**
+    * size of the block the parser will read at a time
+    *
+    * @var int
+    */
+    private $blockSize = 50;
+
+    /**
+    * Where to start reading the file
+    *
+    * @var int
+    */
+    private $startLine = 0;
+
+    /**
+    * How many blocks to read in total
+    *
+    * @var double
+    */
+    private $numberOfBlocks = INF;
+
+    /**
      * Sets the path/filename containing the raw uncompressed CC-CEDICT data
      *
      * @param string $filePath
@@ -44,48 +65,86 @@ class Parser
     }
 
     /**
-     * Reads lines from the file, separates any meta-data,
-     * Parses each line and yields line-per-line as an Entry object
-     * Finally also yields skipped lines, and number of parsed and skipped lines
+     * sets the size of the block the parser should read at a time
      *
-     * @param int $startLine First line to read (0-based), default = 0
-     * @param int $numberOfLines Number of lines to read from $startLine, default = 50
+     * @param int $blockSize
+     */
+    public function setBlockSize(int $blockSize)
+    {
+        $this->blockSize = $blockSize;
+    }
+
+    /**
+     * sets the line number where the parser will start reading. 0-based.
+     *
+     * @param int $startLine
+     */
+    public function setStartLine(int $startLine)
+    {
+        $this->startLine = $startLine;
+    }
+
+    /**
+     * sets the number of blocks that the parser will read in total
+     *
+     * @param double $numberOfBlocks
+     */
+    public function setNumberOfBlocks(int $numberOfBlocks)
+    {
+        $this->numberOfBlocks = $numberOfBlocks;
+    }
+
+    /**
+     * Reads a block of size $blockSize from the file, separates any meta-data,
+     * Parses each yields an array with Entry objects, any skipped lines, and counts
      *
      * @return none (yields arrays)
      */
-    public function parse($startLine = 0, $numberOfLines = 50)
+    public function parse()
     {
+        $blockSize=$this->blockSize;
+        $startLine=$this->startLine;
+        $blocks=$this->numberOfBlocks;
+        
         $parsedLines = [];
         $skippedLines = [];
 
         $file = new SplFileObject($this->filePath);
-        $file->seek($startLine);
-
+        
         if ($file) {
-            $numParsed = 0;
+            $blocksRead = 0;
 
-            for ($i = 0; !$file->eof() && $i < $numberOfLines; $i++) {
-                $line = trim($file->current());
+            while(!$file->eof() && $blocksRead < $blocks) {
+                $parsedLines=[];
+                $skippedLines=[];
+                // move pointer to next block
+                $file->seek(($startLine+($blocksRead*$blockSize)));
 
-                if ($line !== '' || strpos($line, '#') !== 0) {
-                    $parsedLine = $this->parseLine($line);
+                // If EOF was reached in the while-loop above, would that abort the for loop below?
+                // I'm guessing not, so we need to check for EOF again in the for-loop.
+                for ($i = 0; !$file->eof() && $i < $blockSize; $i++) {
+                    $line = trim($file->current());
 
-                    if ($parsedLine) {
-                        $parsedLines[] = $parsedLine;
-                    } else {
-                        $skippedLines[] = $line;
+                    if ($line !== '' || strpos($line, '#') !== 0) {
+                        $parsedLine = $this->parseLine($line);
+
+                        if ($parsedLine) {
+                            $parsedLines[] = $parsedLine;
+                        } else {
+                            $skippedLines[] = $line;
+                        }
                     }
+                    $file->next();
                 }
-
-                $file->next();
+                $blocksRead++;
+                
+                yield [
+                    'parsedLines' => $parsedLines,
+                    'skippedLines' => $skippedLines,
+                    'numSkipped' => count($skippedLines),
+                    'numParsed' => count($parsedLines),
+                ];
             }
-
-            yield [
-                'parsedLines' => $parsedLines,
-                'skippedLines' => $skippedLines,
-                'numSkipped' => count($skippedLines),
-                'numParsed' => count($parsedLines),
-            ];
         } else {
             throw new \Exception('Could not open file for parsing: ' . $this->filePath);
         }
