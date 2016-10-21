@@ -28,12 +28,10 @@ $parser = new Parser();
 // optionally, set options
 $parser->setOptions([
     Entry::F_ORIGINAL,
+    Entry::F_SIMPLIFIED,
     Entry::F_TRADITIONAL,
-    Entry::F_TRADITIONAL_CHARS,
-    Entry::F_SIMPLIFIED_CHARS,
-    Entry::F_ENGLISH,
     Entry::F_PINYIN_DIACRITIC,
-    Entry::F_PINYIN_NUMERIC,
+    Entry::F_ENGLISH_EXPANDED,
 ]);
 
 // tell the parser where the uncompressed data is

@@ -10,6 +10,7 @@ class Entry
     const F_PINYIN_NUMERIC = 'pinyinNumeric';
     const F_PINYIN_DIACRITIC = 'pinyinDiacritic';
     const F_ENGLISH = 'english';
+    const F_ENGLISH_EXPANDED = 'englishExpanded';
     const F_TRADITIONAL_CHARS = 'traditionalChars';
     const F_SIMPLIFIED_CHARS = 'simplifiedChars';
 
@@ -44,7 +45,7 @@ class Entry
      */
     public function getBasic()
     {
-        $this->dataOutput[self::F_ENGLISH] = explode('/', $this->resolveOption(self::F_ENGLISH));
+        $this->dataOutput[self::F_ENGLISH_EXPANDED] = $this->resolveOption(self::F_ENGLISH_EXPANDED);
         $this->dataOutput[self::F_TRADITIONAL_CHARS] = $this->resolveOption(self::F_TRADITIONAL_CHARS);
         $this->dataOutput[self::F_SIMPLIFIED_CHARS] = $this->resolveOption(self::F_SIMPLIFIED_CHARS);
 
@@ -128,6 +129,10 @@ class Entry
             case self::F_PINYIN_DIACRITIC:
                 return $this->convertToPinyinDiacritic($this->resolveOption(self::F_PINYIN));
                 break;
+
+            case self::F_ENGLISH_EXPANDED:
+                return explode("/", $this->dataOriginal[4]);
+
 
             default:
                 throw new \Exception('Unknown option: ' . $option);

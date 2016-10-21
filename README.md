@@ -45,6 +45,7 @@ With setOptions(array) (see above), you can change the data included in the Entr
 - `Entry::F_PINYIN_NUMERIC` includes a string of pinyin converted to numeric Hanyu Pinyin
 - `Entry::F_PINYIN_DIACRITIC` includes a string of pinyin converted to Hanyu Pinyin with diacritics
 - `Entry::F_ENGLISH` includes a string with all the English translations for the lemma
+- `Entry::F_ENGLISH_EXPANDED` includes an array with the above English translations
 - `Entry::F_TRADITIONAL_CHARS` includes an array of all traditional characters in the lemma head
 - `Entry::F_SIMPLIFIED_CHARS` same as above but with simplified characters
 
@@ -59,6 +60,5 @@ With setOptions(array) (see above), you can change the data included in the Entr
 ### Opportunities for improvement
 - Well perhaps it could output various formats (e.g. JSON) instead of simply arrays?
 - Any further Chinese in the English translation (references, alternative spellings, or full forms of abbreviations) could be structured and nested
-- Pinyin English could also be exploded into an array if options are set (currently it only does this when the Basic Entry object is requested)
 - It could be useful to also provide an array of Pinyins rather than a string
 - getFull() still needs to be described
