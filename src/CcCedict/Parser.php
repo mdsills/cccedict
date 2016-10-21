@@ -40,7 +40,7 @@ class Parser
     /**
     * How many blocks to read in total
     *
-    * @var double
+    * @var float
     */
     private $numberOfBlocks = INF;
 
@@ -86,10 +86,12 @@ class Parser
 
     /**
      * sets the number of blocks that the parser will read in total
+     * So when I got the type of 'INF' on a PHP tester site, it returned 'double'.
+     * But here it seems to be a float. Maybe we should really pick -1 for 'all'
      *
-     * @param double $numberOfBlocks
+     * @param float $numberOfBlocks
      */
-    public function setNumberOfBlocks(int $numberOfBlocks)
+    public function setNumberOfBlocks(float $numberOfBlocks)
     {
         $this->numberOfBlocks = $numberOfBlocks;
     }
