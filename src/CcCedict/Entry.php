@@ -8,7 +8,9 @@ class Entry
     const F_SIMPLIFIED = 'simplified';
     const F_PINYIN = 'pinyin';
     const F_PINYIN_NUMERIC = 'pinyinNumeric';
+    const F_PINYIN_NUMERIC_EXPANDED = 'pinyinNumericExpanded';
     const F_PINYIN_DIACRITIC = 'pinyinDiacritic';
+    const F_PINYIN_DIACRITIC_EXPANDED = 'pinyinDiacriticExpanded';
     const F_ENGLISH = 'english';
     const F_ENGLISH_EXPANDED = 'englishExpanded';
     const F_TRADITIONAL_CHARS = 'traditionalChars';
@@ -126,8 +128,16 @@ class Entry
                 return $this->convertToPinyinNumeric($this->resolveOption(self::F_PINYIN));
                 break;
 
+            case self::F_PINYIN_NUMERIC_EXPANDED:
+                return explode(' ', $this->resolveOption(self::F_PINYIN_NUMERIC));
+                break;
+
             case self::F_PINYIN_DIACRITIC:
                 return $this->convertToPinyinDiacritic($this->resolveOption(self::F_PINYIN));
+                break;
+
+            case self::F_PINYIN_DIACRITIC_EXPANDED:
+                return explode(' ', $this->resolveOption(self::F_PINYIN_DIACRITIC));
                 break;
 
             case self::F_ENGLISH_EXPANDED:

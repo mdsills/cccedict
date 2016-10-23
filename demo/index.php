@@ -31,6 +31,7 @@ $parser->setOptions([
     Entry::F_SIMPLIFIED,
     Entry::F_TRADITIONAL,
     Entry::F_PINYIN_DIACRITIC,
+    Entry::F_PINYIN_DIACRITIC_EXPANDED,
     Entry::F_ENGLISH_EXPANDED,
 ]);
 

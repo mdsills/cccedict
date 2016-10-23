@@ -54,5 +54,4 @@ With setOptions(array) (see above), you can change the data included in the Entr
 ### Opportunities for improvement
 - Well perhaps it could output various formats (e.g. JSON) instead of simply arrays?
 - Any further Chinese in the English translation (references, alternative spellings, or full forms of abbreviations) could be structured and nested
-- It could be useful to also provide an array of Pinyins rather than a string
 - getFull() still needs to be described (and made accessible, or removed)
