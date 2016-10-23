@@ -69,7 +69,7 @@ class Parser
      *
      * @param int $blockSize
      */
-    public function setBlockSize(int $blockSize)
+    public function setBlockSize(int $blockSize = 50)
     {
         $this->blockSize = $blockSize;
     }
@@ -79,19 +79,17 @@ class Parser
      *
      * @param int $startLine
      */
-    public function setStartLine(int $startLine)
+    public function setStartLine(int $startLine = 0)
     {
         $this->startLine = $startLine;
     }
 
     /**
      * sets the number of blocks that the parser will read in total
-     * So when I got the type of 'INF' on a PHP tester site, it returned 'double'.
-     * But here it seems to be a float. Maybe we should really pick -1 for 'all'
      *
      * @param float $numberOfBlocks
      */
-    public function setNumberOfBlocks(float $numberOfBlocks)
+    public function setNumberOfBlocks(float $numberOfBlocks = INF)
     {
         $this->numberOfBlocks = $numberOfBlocks;
     }
@@ -104,23 +102,21 @@ class Parser
      */
     public function parse()
     {
-        $blockSize=$this->blockSize;
-        $startLine=$this->startLine;
-        $blocks=$this->numberOfBlocks;
-        
-        $parsedLines = [];
-        $skippedLines = [];
+        $blockSize = $this->blockSize;
+        $startLine = $this->startLine;
+        $blocks = $this->numberOfBlocks;
 
         $file = new SplFileObject($this->filePath);
-        
+
         if ($file) {
             $blocksRead = 0;
 
-            while(!$file->eof() && $blocksRead < $blocks) {
-                $parsedLines=[];
-                $skippedLines=[];
+            while (!$file->eof() && $blocksRead < $blocks) {
+                $parsedLines = [];
+                $skippedLines = [];
+
                 // move pointer to next block
-                $file->seek(($startLine+($blocksRead*$blockSize)));
+                $file->seek($startLine + ($blocksRead * $blockSize));
 
                 // If EOF was reached in the while-loop above, would that abort the for loop below?
                 // I'm guessing not, so we need to check for EOF again in the for-loop.
@@ -139,7 +135,7 @@ class Parser
                     $file->next();
                 }
                 $blocksRead++;
-                
+
                 yield [
                     'parsedLines' => $parsedLines,
                     'skippedLines' => $skippedLines,

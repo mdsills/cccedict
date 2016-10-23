@@ -131,8 +131,8 @@ class Entry
                 break;
 
             case self::F_ENGLISH_EXPANDED:
-                return explode("/", $this->dataOriginal[4]);
-
+                return explode('/', $this->dataOriginal[4]);
+                break;
 
             default:
                 throw new \Exception('Unknown option: ' . $option);
@@ -200,70 +200,18 @@ class Entry
         // $pinyin = "nu:3 er2 lu:5 er4 bing1 liao3 zhuang2 V gou3"; // for testing purposes only
 
         // allowed vowels in pinyin.
-        $vowels = array('a', 'e', 'i', 'o', 'u', 'u:', 'A', 'E', 'I', 'O', 'U', 'U:');
+        $vowels = ['a', 'e', 'i', 'o', 'u', 'u:', 'A', 'E', 'I', 'O', 'U', 'U:'];
+
+        // mapping: tone-vowel to diacritic'd-vowel; keys are tones, values are vowel-mappings
+        $conversion = [
+            1 => array_combine($vowels, ['ā', 'ē', 'ī', 'ō', 'ū', 'ǖ', 'Ā', 'Ē', 'Ī', 'Ō', 'Ū', 'Ǖ']),
+            2 => array_combine($vowels, ['á', 'é', 'í', 'ó', 'ú', 'ǘ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ǘ']),
+            3 => array_combine($vowels, ['ǎ', 'ě', 'ǐ', 'ǒ', 'ǔ', 'ǚ', 'Ǎ', 'Ě', 'Ǐ', 'Ǒ', 'Ǔ', 'Ǚ']),
+            4 => array_combine($vowels, ['à', 'è', 'ì', 'ò', 'ù', 'ǜ', 'À', 'È', 'Ì', 'Ò', 'Ù', 'Ǜ']),
+        ];
 
         // explode pinyin string into elements, including pinyins and any punctuation marks
         $pinyins = explode(' ', $pinyin);
-
-        // map tone-vowel to diacritic'd-vowel
-        $conversion = array(
-            1 => array(
-                'a' => 'ā',
-                'e' => 'ē',
-                'i' => 'ī',
-                'o' => 'ō',
-                'u' => 'ū',
-                'u:' => 'ǖ',
-                'A' => 'Ā',
-                'E' => 'Ē',
-                'I' => 'Ī',
-                'O' => 'Ō',
-                'U' => 'Ū',
-                'U:' => 'Ǖ',
-            ),
-            2 => array(
-                'a' => 'á',
-                'e' => 'é',
-                'i' => 'í',
-                'o' => 'ó',
-                'u' => 'ú',
-                'u:' => 'ǘ',
-                'A' => 'Á',
-                'E' => 'É',
-                'I' => 'Í',
-                'O' => 'Ó',
-                'U' => 'Ú',
-                'U:' => 'Ǘ',
-            ),
-            3 => array(
-                'a' => 'ǎ',
-                'e' => 'ě',
-                'i' => 'ǐ',
-                'o' => 'ǒ',
-                'u' => 'ǔ',
-                'u:' => 'ǚ',
-                'A' => 'Ǎ',
-                'E' => 'Ě',
-                'I' => 'Ǐ',
-                'O' => 'Ǒ',
-                'U' => 'Ǔ',
-                'U:' => 'Ǚ',
-            ),
-            4 => array(
-                'a' => 'à',
-                'e' => 'è',
-                'i' => 'ì',
-                'o' => 'ò',
-                'u' => 'ù',
-                'u:' => 'ǜ',
-                'A' => 'À',
-                'E' => 'È',
-                'I' => 'Ì',
-                'O' => 'Ò',
-                'U' => 'Ù',
-                'U:' => 'Ǜ',
-            ),
-        );
 
         $returnPinyins = [];
 
