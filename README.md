@@ -20,7 +20,7 @@ Reads from a CC-CEDICT Chinese dictionary file, and outputs structured data.
 ### Optional settings
 - setBlockSize(int) sets block size to read and parse at a time
 - setStartLine(int) in case you don't want to start from the beginning
-- setNumberOfBlocks(int) in case you don't want to read all the way to the end. You can use INF.
+- setNumberOfBlocks(float) in case you don't want to read all the way to the end. You can use INF.
 - setOptions(array) define which data you want returned (see below)
 
 ## Returned data
