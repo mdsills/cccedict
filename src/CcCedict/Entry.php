@@ -1,6 +1,14 @@
 <?php
+
 namespace CcCedict;
 
+use \Exception;
+
+/**
+ * Class to represent an Entry in the CC-CEDICT dictionary
+ *
+ * @package CcCedict
+ */
 class Entry
 {
     const F_ORIGINAL = 'original';
@@ -45,7 +53,7 @@ class Entry
      *
      * @return array
      */
-    public function getBasic()
+    public function getBasic(): array
     {
         $this->dataOutput[self::F_ENGLISH_EXPANDED] = $this->resolveOption(self::F_ENGLISH_EXPANDED);
         $this->dataOutput[self::F_TRADITIONAL_CHARS] = $this->resolveOption(self::F_TRADITIONAL_CHARS);
@@ -62,7 +70,7 @@ class Entry
      *
      * @return array
      */
-    public function getOptional(array $options)
+    public function getOptional(array $options): array
     {
         foreach ($options as $option) {
             $this->dataOutput[$option] = $this->resolveOption($option);
@@ -76,7 +84,7 @@ class Entry
      *
      * @return array
      */
-    public function getFull()
+    public function getFull(): array
     {
         $this->getBasic();
 
@@ -92,6 +100,8 @@ class Entry
      * @param  string $option The option we want
      *
      * @return mixed The data for the named option
+     *
+     * @throws Exception
      */
     private function resolveOption($option)
     {
@@ -145,7 +155,7 @@ class Entry
                 break;
 
             default:
-                throw new \Exception('Unknown option: ' . $option);
+                throw new Exception('Unknown option: ' . $option);
         }
     }
 
@@ -156,7 +166,7 @@ class Entry
      *
      * @return array
      */
-    private function extractChineseChars($chinese)
+    private function extractChineseChars($chinese): array
     {
         // below regex script catches all Chinese characters, also those that
         // are outside the everyday spectrum (such as Suzhou numerals or rare
@@ -179,7 +189,8 @@ class Entry
      *
      * @return string
      */
-    private function convertToPinyinNumeric($pinyin) {
+    private function convertToPinyinNumeric($pinyin): string
+    {
         // $pinyin = 'xian4 r5 lu:3 lu:3 r5'; // for testing purposes
         // I'm not sure how these option thingies work so I'm not going to introduce
         // a set of new ones to define the numeric style, but you may call them below.
@@ -206,7 +217,8 @@ class Entry
      *
      * @return string
      */
-    private function convertToPinyinDiacritic($pinyin) {
+    private function convertToPinyinDiacritic($pinyin): string
+    {
         // $pinyin = "nu:3 er2 lu:5 er4 bing1 liao3 zhuang2 V gou3"; // for testing purposes only
 
         // allowed vowels in pinyin.
@@ -268,7 +280,7 @@ class Entry
                     $returnPinyins[] = str_replace(['u:', 'U:'], ['ü', 'Ü'], $pinyin);
                 }
             } else {
-                // simply add items that were not pinyins but rather punctiation marks
+                // simply add items that were not pinyins but rather punctuation marks
                 // or single char without a tone
                 $returnPinyins[] = $pinyin;
             }

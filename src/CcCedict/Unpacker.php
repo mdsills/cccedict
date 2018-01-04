@@ -2,8 +2,12 @@
 
 namespace CcCedict;
 
+use \Exception;
+
 /**
  * Class for uncompressing a CC-CEDICT file
+ *
+ * @package CcCedict
  */
 class Unpacker
 {
@@ -34,11 +38,13 @@ class Unpacker
      * sets the path to the input file
      *
      * @param string $inputFile
+     *
+     * @throws Exception
      */
     public function setInputFile($inputFile)
     {
         if (!file_exists($inputFile) || !is_file($inputFile) || !is_readable($inputFile)) {
-            throw new \Exception('Cannot use ' . $inputFile . ' as input file');
+            throw new Exception('Cannot use '.$inputFile.' as input file');
         }
 
         $this->inputFile = $inputFile;
@@ -48,11 +54,13 @@ class Unpacker
      * sets a temp directory that the file gets uncompressed into
      *
      * @param string $tmp
+     *
+     * @throws Exception
      */
     public function setTempDirectory($tmp)
     {
         if (!file_exists($tmp) || !is_dir($tmp) || !is_writable($tmp)) {
-            throw new \Exception('Cannot use ' . $tmp . ' as a temp directory');
+            throw new Exception('Cannot use '.$tmp.' as a temp directory');
         }
 
         $this->outputFile = $this->getOutputFile($tmp);
@@ -63,7 +71,7 @@ class Unpacker
      *
      * @return string Output file path
      */
-    public function unpack()
+    public function unpack(): string
     {
         if (substr($this->inputFile, -2) == 'gz') {
             $fileContents = '';
@@ -110,9 +118,10 @@ class Unpacker
      * gets the path to the output file
      *
      * @param  string $tmp Temp directory
+     *
      * @return string
      */
-    private function getOutputFile($tmp)
+    private function getOutputFile($tmp): string
     {
         // clean up any existing outputFile
         $this->removeOutputFile();

@@ -2,10 +2,13 @@
 
 namespace CcCedict;
 
+use \Exception;
 use \SplFileObject;
 
 /**
  * Class for parsing the CC-CEDICT dictionary
+ *
+ * @package CcCedict
  */
 class Parser
 {
@@ -96,9 +99,9 @@ class Parser
 
     /**
      * Reads a block of size $blockSize from the file, separates any meta-data,
-     * Parses each yields an array with Entry objects, any skipped lines, and counts
+     * and yields an array with Entry objects, any skipped lines, and counts
      *
-     * @return none (yields arrays)
+     * @throws Exception
      */
     public function parse()
     {
@@ -144,7 +147,7 @@ class Parser
                 ];
             }
         } else {
-            throw new \Exception('Could not open file for parsing: ' . $this->filePath);
+            throw new Exception('Could not open file for parsing: ' . $this->filePath);
         }
     }
 
