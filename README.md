@@ -1,5 +1,8 @@
 # cccedict
 
+## PHP Version
+This parser is written for PHP7. It will not work on PHP5.
+
 ## Demo
 Download the current CC-CEDICT file from http://www.mdbg.net/chindict/chindict.php?page=cc-cedict into the demo folder.
 
