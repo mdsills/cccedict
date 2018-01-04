@@ -1,0 +1,16 @@
+{
+    "name": "mdsills/cccedict",
+    "type": "library",
+    "description": "Parser for CC-CEDICT Chinese-English dictionary",
+    "keywords": ["cc-cedict", "dictionary", "chinese"],
+    "homepage": "https://github.com/mdsills/cccedict",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CcCedict": "src"
+        }
+    }
+}
