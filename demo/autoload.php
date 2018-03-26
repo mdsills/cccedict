@@ -6,7 +6,7 @@
 spl_autoload_register(function ($class) {
 
     $prefix = 'CcCedict\\';
-    $base_dir = __DIR__ . '/../src/CcCedict/';
+    $base_dir = __DIR__ . '/../src/';
     $len = strlen($prefix);
 
     if (strncmp($prefix, $class, $len) !== 0) {
