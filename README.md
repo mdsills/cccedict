@@ -8,6 +8,7 @@ Download the current CC-CEDICT file from http://www.mdbg.net/chindict/chindict.p
 
 ```
 cd demo
+composer install
 wget -O cedict.gz http://www.mdbg.net/chindict/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz
 php -f index.php
 ```

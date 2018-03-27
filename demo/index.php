@@ -1,7 +1,8 @@
 <?php
 
+require('vendor/autoload.php');
+
 require('config.php');
-require('autoload.php');
 
 use CcCedict\Entry;
 use CcCedict\Parser;
