@@ -9,7 +9,7 @@ use CcCedict\Parser;
 use CcCedict\Unpacker;
 
 // UNPACKING
-// file comes from http://www.mdbg.net/chindict/chindict.php?page=cc-cedict
+// file comes from https://www.mdbg.net/chinese/dictionary?page=cc-cedict
 // either zipped or gzipped - we need to unpack it
 $unpacker = new Unpacker();
 

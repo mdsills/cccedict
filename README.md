@@ -1,15 +1,15 @@
 # cccedict
 
 ## PHP Version
-This parser is written for PHP7. It will not work on PHP5.
+This parser is written for >= PHP7. It will not work on PHP5.
 
 ## Demo
-Download the current CC-CEDICT file from http://www.mdbg.net/chindict/chindict.php?page=cc-cedict into the demo folder.
+Download the current CC-CEDICT file from https://www.mdbg.net/chinese/dictionary?page=cc-cedict into the demo folder.
 
 ```
 cd demo
 composer install
-wget -O cedict.gz http://www.mdbg.net/chindict/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz
+wget -O cedict.gz https://www.mdbg.net/chinese/export/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz
 php -f index.php
 ```
 

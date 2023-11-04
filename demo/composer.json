@@ -1,6 +1,5 @@
 {
-    "minimum-stability": "dev",
     "require": {
-        "mdsills/cccedict": "dev-master"
+        "mdsills/cccedict": "^1.0.0"
     }
 }
