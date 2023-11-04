@@ -39,9 +39,32 @@ class Entry
     private $dataOutput;
 
     /**
+     * @var string
+     */
+    private $line;
+
+    /**
+     * @var bool
+     */
+    private $isValid = false;
+
+    function __construct(string $line = '')
+    {
+        // e.g.
+        // Traditional Simplified [pin1 yin1] /English equivalent 1/equivalent 2/
+        // 中國 中国 [Zhong1 guo2] /China/Middle Kingdom/
+        $this->line = $line;
+        if (preg_match('#(.+) (.+) \[(.+)] /(.*)/#', $this->line, $match)) {
+            $this->setData($match);
+            $this->isValid = true;
+        }
+    }
+
+    /**
      * sets the data values from the parser's match data
      *
      * @param array $match
+     * @deprecated use constructor to send in unparsed line
      */
     public function setData(array $match)
     {
@@ -95,6 +118,11 @@ class Entry
         $this->dataOutput[self::F_PINYIN_DIACRITIC] = $this->resolveOption(self::F_PINYIN_DIACRITIC);
 
         return $this->dataOutput;
+    }
+
+    public function isValid(): bool
+    {
+        return $this->isValid;
     }
 
     /**
@@ -162,7 +190,7 @@ class Entry
         // below regex script catches all Chinese characters, also those that
         // are outside the everyday spectrum (such as Suzhou numerals or rare
         // variants). This makes sense for the dictionary, \p{Lo} didn't quite cut it.
-        preg_match_all('#\p{Han}#u', $chinese, $matches);
+        preg_match_all('#[A-Z\p{Han}]#u', $chinese, $matches);
 
         return $matches[0];
     }
@@ -267,11 +295,6 @@ class Entry
             }
         }
 
-        if (isset($returnPinyins)) {
-            return implode(' ', $returnPinyins);
-        }
-
-        // if somehow nothing was set during the above, return error message
-        return 'No valid elements';
+        return implode(' ', $returnPinyins);
     }
 }

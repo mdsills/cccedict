@@ -161,20 +161,16 @@ class Parser
     private function parseLine(string $line)
     {
         $line = trim($line);
+        $entry = new Entry($line);
 
-        // Traditional Simplified [pin1 yin1] /English equivalent 1/equivalent 2/
-        // 中國 中国 [Zhong1 guo2] /China/Middle Kingdom/
-        if (preg_match('#(.+) (.+) \[(.+)] /(.*)/#', $line, $match)) {
-            $entry = new Entry();
-            $entry->setData($match);
-
+        if ($entry->isValid()) {
             if (count($this->options)) {
                 return $entry->getOptional($this->options);
             } else {
                 return $entry->getBasic();
             }
-        } else {
-            return false;
         }
+
+        return false;
     }
 }
