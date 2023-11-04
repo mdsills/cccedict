@@ -2,8 +2,9 @@
 
 namespace CcCedict;
 
-use \Exception;
-use \SplFileObject;
+use Exception;
+use Generator;
+use SplFileObject;
 
 /**
  * Class for parsing the CC-CEDICT dictionary
@@ -12,6 +13,8 @@ use \SplFileObject;
  */
 class Parser
 {
+    const DEFAULT_BLOCK_SIZE = 50;
+
     /**
      * path/filename to the CC-CEDICT data
      *
@@ -31,7 +34,7 @@ class Parser
     *
     * @var int
     */
-    private $blockSize = 50;
+    private $blockSize = self::DEFAULT_BLOCK_SIZE;
 
     /**
     * Where to start reading the file
@@ -52,7 +55,7 @@ class Parser
      *
      * @param string $filePath
      */
-    public function setFilePath($filePath)
+    public function setFilePath(string $filePath)
     {
         $this->filePath = $filePath;
     }
@@ -103,7 +106,7 @@ class Parser
      *
      * @throws Exception
      */
-    public function parse()
+    public function parse(): Generator
     {
         $blockSize = $this->blockSize;
         $startLine = $this->startLine;
@@ -111,60 +114,57 @@ class Parser
 
         $file = new SplFileObject($this->filePath);
 
-        if ($file) {
-            $blocksRead = 0;
+        $blocksRead = 0;
 
-            while (!$file->eof() && $blocksRead < $blocks) {
-                $parsedLines = [];
-                $skippedLines = [];
+        while (!$file->eof() && $blocksRead < $blocks) {
+            $parsedLines = [];
+            $skippedLines = [];
 
-                // move pointer to next block
-                $file->seek($startLine + ($blocksRead * $blockSize));
+            // move pointer to next block
+            $file->seek($startLine + ($blocksRead * $blockSize));
 
-                // If EOF was reached in the while-loop above, would that abort the for loop below?
-                // I'm guessing not, so we need to check for EOF again in the for-loop.
-                for ($i = 0; !$file->eof() && $i < $blockSize; $i++) {
-                    $line = trim($file->current());
+            // If EOF was reached in the while-loop above, would that abort the for loop below?
+            // I'm guessing not, so we need to check for EOF again in the for-loop.
+            for ($i = 0; !$file->eof() && $i < $blockSize; $i++) {
+                $line = trim($file->current());
 
-                    if ($line !== '' || strpos($line, '#') !== 0) {
-                        $parsedLine = $this->parseLine($line);
+                if ($line !== '' || strpos($line, '#') !== 0) {
+                    $parsedLine = $this->parseLine($line);
 
-                        if ($parsedLine) {
-                            $parsedLines[] = $parsedLine;
-                        } else {
-                            $skippedLines[] = $line;
-                        }
+                    if ($parsedLine) {
+                        $parsedLines[] = $parsedLine;
+                    } else {
+                        $skippedLines[] = $line;
                     }
-                    $file->next();
                 }
-                $blocksRead++;
-
-                yield [
-                    'parsedLines' => $parsedLines,
-                    'skippedLines' => $skippedLines,
-                    'numSkipped' => count($skippedLines),
-                    'numParsed' => count($parsedLines),
-                ];
+                $file->next();
             }
-        } else {
-            throw new Exception('Could not open file for parsing: ' . $this->filePath);
+            $blocksRead++;
+
+            yield [
+                'parsedLines' => $parsedLines,
+                'skippedLines' => $skippedLines,
+                'numSkipped' => count($skippedLines),
+                'numParsed' => count($parsedLines),
+            ];
         }
     }
 
     /**
      * parses a single line from the file, checking to see it meets basic dictionary spec
      *
-     * @param  string $line A line from the CC-CEDICT file
+     * @param string $line A line from the CC-CEDICT file
      *
      * @return false|array
+     * @throws Exception
      */
-    private function parseLine($line)
+    private function parseLine(string $line)
     {
         $line = trim($line);
 
         // Traditional Simplified [pin1 yin1] /English equivalent 1/equivalent 2/
         // 中國 中国 [Zhong1 guo2] /China/Middle Kingdom/
-        if (preg_match('#(.+) (.+) \[(.+)\] /(.*)/#', $line, $match)) {
+        if (preg_match('#(.+) (.+) \[(.+)] /(.*)/#', $line, $match)) {
             $entry = new Entry();
             $entry->setData($match);
 

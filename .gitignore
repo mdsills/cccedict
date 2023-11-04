@@ -1,4 +1,10 @@
+.idea/
+vendor/
+
+.phpunit.result.cache
+output.json
+composer.lock
+
 demo/*.gz
 demo/*.zip
-output.json
-.idea
+demo/*.txt

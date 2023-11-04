@@ -2,7 +2,7 @@
 
 namespace CcCedict;
 
-use \Exception;
+use Exception;
 
 /**
  * Class to represent an Entry in the CC-CEDICT dictionary
@@ -43,7 +43,7 @@ class Entry
      *
      * @param array $match
      */
-    public function setData($match)
+    public function setData(array $match)
     {
         $this->dataOriginal = $match;
     }
@@ -52,6 +52,7 @@ class Entry
      * gets a basic report of the entry content
      *
      * @return array
+     * @throws Exception
      */
     public function getBasic(): array
     {
@@ -65,10 +66,11 @@ class Entry
     /**
      * gets a report of the entry content, featuring specified fields
      *
-     * @param  array $options Fields we want to see in the report, referenced by
+     * @param array $options Fields we want to see in the report, referenced by
      *                        class constants, e.g. Entry::F_ORIGINAL
      *
      * @return array
+     * @throws Exception
      */
     public function getOptional(array $options): array
     {
@@ -83,6 +85,7 @@ class Entry
      * gets a full report of the entry content
      *
      * @return array
+     * @throws Exception
      */
     public function getFull(): array
     {
@@ -103,56 +106,44 @@ class Entry
      *
      * @throws Exception
      */
-    private function resolveOption($option)
+    private function resolveOption(string $option)
     {
         switch ($option) {
             case self::F_ORIGINAL:
                 return $this->dataOriginal[0];
-                break;
 
             case self::F_TRADITIONAL:
                 return $this->dataOriginal[1];
-                break;
 
             case self::F_SIMPLIFIED:
                 return $this->dataOriginal[2];
-                break;
 
             case self::F_PINYIN:
                 return $this->dataOriginal[3];
-                break;
 
             case self::F_ENGLISH:
                 return $this->dataOriginal[4];
-                break;
 
             case self::F_TRADITIONAL_CHARS:
                 return $this->extractChineseChars($this->resolveOption(self::F_TRADITIONAL));
-                break;
 
             case self::F_SIMPLIFIED_CHARS:
                 return $this->extractChineseChars($this->resolveOption(self::F_SIMPLIFIED));
-                break;
 
             case self::F_PINYIN_NUMERIC:
                 return $this->convertToPinyinNumeric($this->resolveOption(self::F_PINYIN));
-                break;
 
             case self::F_PINYIN_NUMERIC_EXPANDED:
                 return explode(' ', $this->resolveOption(self::F_PINYIN_NUMERIC));
-                break;
 
             case self::F_PINYIN_DIACRITIC:
                 return $this->convertToPinyinDiacritic($this->resolveOption(self::F_PINYIN));
-                break;
 
             case self::F_PINYIN_DIACRITIC_EXPANDED:
                 return explode(' ', $this->resolveOption(self::F_PINYIN_DIACRITIC));
-                break;
 
             case self::F_ENGLISH_EXPANDED:
                 return explode('/', $this->dataOriginal[4]);
-                break;
 
             default:
                 throw new Exception('Unknown option: ' . $option);
@@ -166,22 +157,22 @@ class Entry
      *
      * @return array
      */
-    private function extractChineseChars($chinese): array
+    private function extractChineseChars(string $chinese): array
     {
         // below regex script catches all Chinese characters, also those that
         // are outside the everyday spectrum (such as Suzhou numerals or rare
         // variants). This makes sense for the dictionary, \p{Lo} didn't quite cut it.
-        preg_match_all('#[\p{Han}]#u', $chinese, $matches);
+        preg_match_all('#\p{Han}#u', $chinese, $matches);
 
         return $matches[0];
     }
 
     /**
-     * Converts the CC-CEDICT pinyin to more familar numeric pinyin
+     * Converts the CC-CEDICT pinyin to more familiar numeric pinyin
      *
      * CC-CEDICT Pinyin formatting info: https://cc-cedict.org/wiki/format:syntax
      *
-     * This deals with idiocyncracies in CC-CEDICT pinyin where:
+     * This deals with idiosyncrasies in CC-CEDICT pinyin where:
      * lu:4 => lü4
      * xian4 r5 => xianr4
      *
@@ -189,22 +180,12 @@ class Entry
      *
      * @return string
      */
-    private function convertToPinyinNumeric($pinyin): string
+    private function convertToPinyinNumeric(string $pinyin): string
     {
         // $pinyin = 'xian4 r5 lu:3 lu:3 r5'; // for testing purposes
-        // I'm not sure how these option thingies work so I'm not going to introduce
-        // a set of new ones to define the numeric style, but you may call them below.
-        $relevantOptionName = true;
+        $pinyin = str_replace(['u:','U:'], ['ü','Ü'], $pinyin);
 
-        if ($relevantOptionName) {
-            $pinyin = str_replace(['u:','U:'], ['ü','Ü'], $pinyin);
-        }
-
-        if ($relevantOptionName) {
-            $pinyin = preg_replace('/(\d) r5/', 'r$1', $pinyin);
-        }
-
-        return $pinyin;
+        return preg_replace('/(\d) r5/', 'r$1', $pinyin);
     }
 
     /**
@@ -217,7 +198,7 @@ class Entry
      *
      * @return string
      */
-    private function convertToPinyinDiacritic($pinyin): string
+    private function convertToPinyinDiacritic(string $pinyin): string
     {
         // $pinyin = "nu:3 er2 lu:5 er4 bing1 liao3 zhuang2 V gou3"; // for testing purposes only
 
@@ -276,7 +257,7 @@ class Entry
                     }
                 } else {
                     // u: => ü conversion still required for neutral tones and anything
-                    // anything that was not a pinyin (like a middot or a single char)
+                    // that was not a pinyin (like a middot or a single char)
                     $returnPinyins[] = str_replace(['u:', 'U:'], ['ü', 'Ü'], $pinyin);
                 }
             } else {

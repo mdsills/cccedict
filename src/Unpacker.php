@@ -2,7 +2,7 @@
 
 namespace CcCedict;
 
-use \Exception;
+use Exception;
 
 /**
  * Class for uncompressing a CC-CEDICT file
@@ -41,7 +41,7 @@ class Unpacker
      *
      * @throws Exception
      */
-    public function setInputFile($inputFile)
+    public function setInputFile(string $inputFile)
     {
         if (!file_exists($inputFile) || !is_file($inputFile) || !is_readable($inputFile)) {
             throw new Exception('Cannot use '.$inputFile.' as input file');
@@ -57,7 +57,7 @@ class Unpacker
      *
      * @throws Exception
      */
-    public function setTempDirectory($tmp)
+    public function setTempDirectory(string $tmp)
     {
         if (!file_exists($tmp) || !is_dir($tmp) || !is_writable($tmp)) {
             throw new Exception('Cannot use '.$tmp.' as a temp directory');
@@ -121,7 +121,7 @@ class Unpacker
      *
      * @return string
      */
-    private function getOutputFile($tmp): string
+    private function getOutputFile(string $tmp): string
     {
         // clean up any existing outputFile
         $this->removeOutputFile();
